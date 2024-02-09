@@ -137,3 +137,5 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
     ],
 }
+# Указываем нашу кастомную модель пользователя
+AUTH_USER_MODEL = 'users.CustomUser'

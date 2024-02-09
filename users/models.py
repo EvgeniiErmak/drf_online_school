@@ -1,6 +1,6 @@
 # users/models.py
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 
 class CustomUser(AbstractUser):
@@ -9,6 +9,10 @@ class CustomUser(AbstractUser):
     city = models.CharField(max_length=255)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
 
-    # Добавляем related_name для полей groups и user_permissions
-    groups = models.ManyToManyField('auth.Group', related_name='customuser_set', blank=True)
-    user_permissions = models.ManyToManyField('auth.Permission', related_name='customuser_set', blank=True)
+    # Отключение поля username
+    username = None
+
+    # Установка email в качестве USERNAME_FIELD
+    USERNAME_FIELD = 'email'
+    # Обязательные поля, кроме email
+    REQUIRED_FIELDS = ['phone', 'city']
