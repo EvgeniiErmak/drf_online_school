@@ -89,6 +89,16 @@ files = [
 Django = ">=3.2"
 
 [[package]]
+name = "django-template-bootstrap"
+version = "0.2.15"
+description = "A django template based on twitter's bootstrap project."
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-template-bootstrap-0.2.15.tar.gz", hash = "sha256:7e79741e38edcadfe69fba78afdac5dcadea82b0a9ef60b08ea0e7db35725a9d"},
+]
+
+[[package]]
 name = "djangorestframework"
 version = "3.14.0"
 description = "Web APIs for Django, made easy."
@@ -531,4 +541,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "f78c2448383b52f372db776a95301f5fc8b8120a754122f6324ef11d5c115af2"
+content-hash = "b8195f6766d8dbf768a5c1cafc4e4bbc362db90d6327be710f50404e186ef3c1"
