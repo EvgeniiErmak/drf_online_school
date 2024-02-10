@@ -1,0 +1,12 @@
+{% extends 'materials/base.html' %}
+
+{% block content %}
+    <h2>Available Lessons</h2>
+    <ul>
+    {% for lesson in lessons %}
+        <li><a href="{% url 'lesson-detail' lesson.pk %}">{{ lesson.title }}</a></li>
+    {% empty %}
+        <li>No lessons available.</li>
+    {% endfor %}
+    </ul>
+{% endblock %}

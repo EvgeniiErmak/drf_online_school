@@ -1,8 +1,10 @@
 # users/urls.py
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 from .views import UserProfileViewSet
 
-router = DefaultRouter()
-router.register(r'profile', UserProfileViewSet, basename='user-profile')
+app_name = 'users'
 
-urlpatterns = router.urls
+urlpatterns = [
+    path('user-profile/', UserProfileViewSet.as_view({'get': 'list', 'post': 'create'}), name='user-profile'),
+    path('user-profile/<int:pk>/', UserProfileViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='user-profile-detail'),
+]

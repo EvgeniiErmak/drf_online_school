@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Django Online School{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <h1>Django Online School</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'materials:course-list' %}">Courses</a></li>
+                <li><a href="{% url 'materials:lesson-list' %}">Lessons</a></li>
+                <li><a href="{% url 'users:user-profile' %}">User Profile</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2024 Django Online School</p>
+    </footer>
+</body>
+</html>

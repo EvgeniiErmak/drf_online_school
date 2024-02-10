@@ -1,0 +1,15 @@
+{% extends 'materials/base.html' %}
+
+{% block title %}Home - Django Online School{% endblock %}
+
+{% block content %}
+    <section>
+        <h2>Welcome to the Online School</h2>
+        <p>This is the home page of our online school.</p>
+        <p>Here are some links:</p>
+        <ul>
+            <li><a href="{% url 'materials:course-list' %}">Courses</a></li>
+            <!-- Add more links as needed -->
+        </ul>
+    </section>
+{% endblock %}
