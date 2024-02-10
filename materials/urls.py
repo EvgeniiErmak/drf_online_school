@@ -1,11 +1,14 @@
 # materials/urls.py
+from django.urls import path
 from rest_framework.routers import DefaultRouter
 from .views import CourseViewSet, LessonListCreateView, LessonRetrieveUpdateDestroyView
 
 router = DefaultRouter()
-router.register(r'courses', CourseViewSet, basename='course')
-# Используем as_view для преобразования generic-классов в view функции
-router.register(r'lessons', LessonListCreateView.as_view(), basename='lesson-list')
-router.register(r'lessons', LessonRetrieveUpdateDestroyView.as_view(), basename='lesson-detail')
+router.register(r'courses', CourseViewSet)
 
-urlpatterns = router.urls
+urlpatterns = [
+    path('lessons/', LessonListCreateView.as_view(), name='lesson-list-create'),
+    path('lessons/<int:pk>/', LessonRetrieveUpdateDestroyView.as_view(), name='lesson-retrieve-update-destroy'),
+]
+
+urlpatterns += router.urls
