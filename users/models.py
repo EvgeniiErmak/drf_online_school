@@ -1,5 +1,7 @@
 # users/models.py
 from django.contrib.auth.models import AbstractUser
+from materials.models import Course, Lesson
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
@@ -16,3 +18,16 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     # Обязательные поля, кроме email
     REQUIRED_FIELDS = ['phone', 'city']
+
+
+class Payment(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    payment_date = models.DateField()
+    course = models.ForeignKey(Course, null=True, blank=True, on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, null=True, blank=True, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_method_choices = (
+        ('cash', 'Наличные'),
+        ('transfer', 'Перевод на счет'),
+    )
+    payment_method = models.CharField(max_length=10, choices=payment_method_choices)

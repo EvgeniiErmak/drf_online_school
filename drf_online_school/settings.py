@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'materials.apps.MaterialsConfig',
     'rest_framework',
+    'bootstrap4',
     'users',
 ]
 
@@ -65,10 +66,12 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.static',  # Add this line for static files
             ],
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'drf_online_school.wsgi.application'
 
