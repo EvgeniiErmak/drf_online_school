@@ -1,3 +1,4 @@
+<!-- base.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +14,8 @@
             <ul>
                 <li><a href="{% url 'materials:course-list' %}">Courses</a></li>
                 <li><a href="{% url 'materials:lesson-list' %}">Lessons</a></li>
-                <li><a href="{% url 'users:user-profile' %}">User Profile</a></li>
+                <!-- Используйте 'users:user-profile-list' для ссылки на пользовательский профиль -->
+                <li><a href="{% url 'users:user-profile-list' %}">User Profile</a></li>
             </ul>
         </nav>
     </header>
