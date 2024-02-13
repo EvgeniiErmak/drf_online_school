@@ -12,5 +12,6 @@ router = DefaultRouter()
 router.register(r'user-profile', UserProfileViewSet, basename='user-profile')
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('user-profile/', UserProfileViewSet.as_view({'get': 'list', 'post': 'create'}), name='user-profile'),
+    path('user-profile/<int:pk>/', UserProfileViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='user-profile-detail'),
 ]
