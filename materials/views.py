@@ -1,37 +1,65 @@
 # materials/views.py
-from django.views.generic.base import TemplateView
 from rest_framework import generics, viewsets
-from .models import Course, Lesson, Payment  # Добавляем импорт модели Payment
-from .serializers import CourseSerializer, LessonSerializer, PaymentSerializer  # Добавляем импорт сериализатора PaymentSerializer
-
-
-class HomeView(TemplateView):
-    template_name = 'materials/home.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Добавьте здесь любые необходимые данные для передачи в шаблон
-        return context
+from rest_framework.permissions import IsAuthenticated
+from .models import Course, Lesson, Payment
+from .serializers import CourseSerializer, LessonSerializer, PaymentSerializer
+from users.permissions import IsModerator  # Импорт нашего кастомного пермишена
 
 
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+    permission_classes = [IsAuthenticated]  # Пермишен для авторизованных пользователей
+
+    # Определяем права доступа для разных методов
+    def get_permissions(self):
+        if self.action in ['create', 'destroy']:
+            permission_classes = [IsModerator]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
 
 class LessonListCreateView(generics.ListCreateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    permission_classes = [IsAuthenticated]  # Пермишен для авторизованных пользователей
+
+    # Определяем права доступа для разных методов
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            permission_classes = [IsModerator]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
 
 class LessonRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    permission_classes = [IsAuthenticated]  # Пермишен для авторизованных пользователей
+
+    # Определяем права доступа для разных методов
+    def get_permissions(self):
+        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
+            permission_classes = [IsModerator]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
 
 class PaymentListCreateView(generics.ListCreateAPIView):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]  # Пермишен для авторизованных пользователей
+
+    # Определяем права доступа для разных методов
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            permission_classes = [IsModerator]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
     def get_queryset(self):
         queryset = super().get_queryset()
