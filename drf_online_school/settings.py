@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'materials.apps.MaterialsConfig',
+    'rest_framework_simplejwt',
     'django_bootstrap5',
     'rest_framework',
     'bootstrap4',
@@ -144,6 +145,14 @@ REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
     ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
+
 # Указываем нашу кастомную модель пользователя
 AUTH_USER_MODEL = 'users.CustomUser'
+
