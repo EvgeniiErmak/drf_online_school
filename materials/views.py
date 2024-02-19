@@ -3,7 +3,7 @@ from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
 from .models import Course, Lesson, Payment
 from .serializers import CourseSerializer, LessonSerializer, PaymentSerializer
-from users.permissions import IsModerator  # Импорт нашего кастомного пермишена
+from users.permissions import IsModerator, IsOwnerOrModerator
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -16,7 +16,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'destroy']:
             permission_classes = [IsModerator]
         else:
-            permission_classes = [IsAuthenticated]
+            permission_classes = [IsOwnerOrModerator]
         return [permission() for permission in permission_classes]
 
 
@@ -30,7 +30,7 @@ class LessonListCreateView(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             permission_classes = [IsModerator]
         else:
-            permission_classes = [IsAuthenticated]
+            permission_classes = [IsOwnerOrModerator]
         return [permission() for permission in permission_classes]
 
 
@@ -44,7 +44,7 @@ class LessonRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method in ['PUT', 'PATCH', 'DELETE']:
             permission_classes = [IsModerator]
         else:
-            permission_classes = [IsAuthenticated]
+            permission_classes = [IsOwnerOrModerator]
         return [permission() for permission in permission_classes]
 
 
@@ -58,7 +58,7 @@ class PaymentListCreateView(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             permission_classes = [IsModerator]
         else:
-            permission_classes = [IsAuthenticated]
+            permission_classes = [IsOwnerOrModerator]
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
