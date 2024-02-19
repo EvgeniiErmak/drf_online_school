@@ -2,8 +2,18 @@
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
 from .models import Course, Lesson, Payment
+from django.views.generic.base import TemplateView
 from .serializers import CourseSerializer, LessonSerializer, PaymentSerializer
 from users.permissions import IsModerator, IsOwnerOrModerator
+
+
+class HomeView(TemplateView):
+    template_name = 'materials/home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Добавьте здесь любые необходимые данные для передачи в шаблон
+        return context
 
 
 class CourseViewSet(viewsets.ModelViewSet):
