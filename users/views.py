@@ -19,7 +19,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         if self.action in ['update', 'partial_update']:
             permission_classes = [IsOwnerOrModerator]
         else:
-            permission_classes = [permissions.IsAuthenticated]
+            permission_classes = [permissions.AllowAny]  # изменено на разрешение для всех
         return [permission() for permission in permission_classes]
 
     @action(detail=False, methods=['post'])
@@ -27,6 +27,8 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        user.set_password(request.data.get('password'))  # хешируем пароль
+        user.save()
 
         refresh = RefreshToken.for_user(user)
 
