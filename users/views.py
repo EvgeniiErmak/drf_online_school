@@ -9,7 +9,6 @@ from .permissions import IsOwnerOrModerator
 
 User = get_user_model()
 
-
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
@@ -22,14 +21,18 @@ class UserProfileViewSet(viewsets.ModelViewSet):
             permission_classes = [permissions.AllowAny]  # изменено на разрешение для всех
         return [permission() for permission in permission_classes]
 
+    def perform_create(self, serializer):
+        user = serializer.save()
+        user.set_password(self.request.data.get('password'))  # хешируем пароль
+        user.save()
+
     @action(detail=False, methods=['post'])
     def register(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        user.set_password(request.data.get('password'))  # хешируем пароль
-        user.save()
+        self.perform_create(serializer)
 
+        user = serializer.instance  # получаем экземпляр пользователя после создания
         refresh = RefreshToken.for_user(user)
 
         return Response({
