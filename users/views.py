@@ -9,6 +9,7 @@ from .permissions import IsOwnerOrModerator
 
 User = get_user_model()
 
+
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer

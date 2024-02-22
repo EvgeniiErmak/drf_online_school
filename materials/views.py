@@ -1,10 +1,11 @@
 # materials/views.py
-from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
 from .models import Course, Lesson, Payment
 from django.views.generic.base import TemplateView
 from .serializers import CourseSerializer, LessonSerializer, PaymentSerializer
 from users.permissions import IsModerator, IsOwnerOrModerator
+from rest_framework import generics, viewsets, permissions, status
+from rest_framework.response import Response
 
 
 class HomeView(TemplateView):
@@ -19,15 +20,25 @@ class HomeView(TemplateView):
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [IsAuthenticated]  # Пермишен для авторизованных пользователей
+    permission_classes = [permissions.IsAuthenticated]
 
-    # Определяем права доступа для разных методов
     def get_permissions(self):
         if self.action in ['create', 'destroy']:
             permission_classes = [IsModerator]
         else:
-            permission_classes = [IsOwnerOrModerator]
+            permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
+
+    # Привязываем курс к пользователю-владельцу
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+    # Добавляем метод удаления модератора курса
+    def destroy_moderator(self, request, *args, **kwargs):
+        course = self.get_object()
+        course.moderator = None
+        course.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class LessonListCreateView(generics.ListCreateAPIView):
@@ -42,6 +53,10 @@ class LessonListCreateView(generics.ListCreateAPIView):
         else:
             permission_classes = [IsOwnerOrModerator]
         return [permission() for permission in permission_classes]
+
+    # Привязываем урок к пользователю-владельцу при создании
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class LessonRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
