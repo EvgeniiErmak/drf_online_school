@@ -2,7 +2,7 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from .serializers import CustomUserSerializer
 
@@ -33,9 +33,10 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
 
         user = serializer.instance
-        access_token = AccessToken.for_user(user)  # Используем AccessToken для создания токена доступа
+        refresh = RefreshToken.for_user(user)
 
         return Response({
             'user': serializer.data,
-            'access': str(access_token),  # Используем токен доступа для access
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
         }, status=status.HTTP_201_CREATED)
