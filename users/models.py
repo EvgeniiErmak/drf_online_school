@@ -1,5 +1,5 @@
 # users/models.py
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser, BaseUserManager, Group
 from django.db import models
 
 
@@ -38,3 +38,10 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ['phone', 'city']
 
     objects = CustomUserManager()
+
+    def save(self, *args, **kwargs):
+        # При сохранении нового пользователя добавляем его в группу "Пользователи"
+        if not self.pk:  # Если пользователь новый
+            group, created = Group.objects.get_or_create(name='Пользователи')
+            self.groups.add(group)
+        super().save(*args, **kwargs)

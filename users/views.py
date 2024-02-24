@@ -5,7 +5,6 @@ from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from .serializers import CustomUserSerializer
-from .permissions import IsOwnerOrModerator
 
 User = get_user_model()
 
@@ -17,14 +16,14 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['update', 'partial_update']:
-            permission_classes = [IsOwnerOrModerator]
+            permission_classes = [permissions.IsAuthenticated]
         else:
-            permission_classes = [permissions.AllowAny]  # изменено на разрешение для всех
+            permission_classes = [permissions.AllowAny]
         return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
         user = serializer.save()
-        user.set_password(self.request.data.get('password'))  # хешируем пароль
+        user.set_password(self.request.data.get('password'))
         user.save()
 
     @action(detail=False, methods=['post'])
@@ -33,7 +32,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
 
-        user = serializer.instance  # получаем экземпляр пользователя после создания
+        user = serializer.instance
         refresh = RefreshToken.for_user(user)
 
         return Response({

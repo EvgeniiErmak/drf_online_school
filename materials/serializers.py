@@ -10,7 +10,7 @@ class LessonSerializer(serializers.ModelSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
-    lessons = LessonSerializer(many=True, read_only=True)  # Добавляем вложенный сериализатор для уроков
+    lessons = LessonSerializer(many=True, read_only=True)
 
     lessons_count = serializers.SerializerMethodField()
 
