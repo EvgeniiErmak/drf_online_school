@@ -1,6 +1,8 @@
 # users/models.py
 from django.contrib.auth.models import AbstractUser, BaseUserManager, Group
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class CustomUserManager(BaseUserManager):
@@ -39,9 +41,9 @@ class CustomUser(AbstractUser):
 
     objects = CustomUserManager()
 
-    def save(self, *args, **kwargs):
-        # При сохранении нового пользователя добавляем его в группу "Пользователи"
-        if not self.pk:  # Если пользователь новый
-            group, created = Group.objects.get_or_create(name='Пользователи')
-            self.groups.add(group)
-        super().save(*args, **kwargs)
+
+@receiver(post_save, sender=CustomUser)
+def add_to_users_group(sender, instance, created, **kwargs):
+    if created:
+        group, created = Group.objects.get_or_create(name='Пользователи')
+        instance.groups.add(group)

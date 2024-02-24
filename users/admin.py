@@ -20,6 +20,28 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('email', 'phone', 'city')
     list_filter = ('is_staff', 'is_superuser', 'groups')  # Добавлено поле groups
 
+    # Переопределение метода для отображения полей при редактировании
+    def get_fieldsets(self, request, obj=None):
+        if obj is None or request.user.groups.filter(name='Пользователи').exists():
+            return (
+                (None, {'fields': ('email', 'password')}),
+                ('Personal info', {'fields': ('phone', 'city', 'avatar')}),
+                ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups')}),
+                ('Important dates', {'fields': ('last_login',)}),
+            )
+        return super().get_fieldsets(request, obj)
+
+    # Переопределение метода для отображения полей при добавлении нового пользователя
+    def get_add_fieldsets(self, request, obj=None):
+        if request.user.groups.filter(name='Пользователи').exists():
+            return (
+                (None, {
+                    'classes': ('wide',),
+                    'fields': ('email', 'phone', 'city', 'password1', 'password2', 'groups'),
+                }),
+            )
+        return super().get_add_fieldsets(request, obj)
+
     # Добавляем фильтрацию курсов и уроков для группы "Пользователи"
     def get_queryset(self, request):
         qs = super().get_queryset(request)
