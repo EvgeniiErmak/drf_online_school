@@ -1,8 +1,8 @@
 # materials/views.py
-from rest_framework.permissions import IsAuthenticated
 from .models import Course, Lesson, Payment
 from django.views.generic.base import TemplateView
 from .serializers import CourseSerializer, LessonSerializer, PaymentSerializer
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from users.permissions import IsModerator, IsOwner
 from rest_framework import generics, viewsets, status
 from rest_framework.response import Response
@@ -23,11 +23,10 @@ class CourseViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
-        if self.action in ['create', 'destroy']:
-            permission_classes = [IsModerator]
+        if self.request.user.is_superuser:
+            return [IsAdminUser()]
         else:
-            permission_classes = [IsOwner | IsModerator]
-        return [permission() for permission in permission_classes]
+            return [IsOwner | IsModerator | IsAuthenticated]
 
     # Привязываем курс к пользователю-владельцу
     def perform_create(self, serializer):
@@ -47,11 +46,10 @@ class LessonListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
-        if self.request.method == 'POST':
-            permission_classes = [IsModerator]
+        if self.request.user.is_superuser:
+            return [IsAdminUser()]
         else:
-            permission_classes = [IsOwner | IsModerator]
-        return [permission() for permission in permission_classes]
+            return [IsOwner | IsModerator | IsAuthenticated]
 
     # Привязываем урок к пользователю-владельцу при создании
     def perform_create(self, serializer):
@@ -64,11 +62,10 @@ class LessonRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
-        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
-            permission_classes = [IsModerator]
+        if self.request.user.is_superuser:
+            return [IsAdminUser()]
         else:
-            permission_classes = [IsOwner | IsModerator]
-        return [permission() for permission in permission_classes]
+            return [IsOwner | IsModerator | IsAuthenticated]
 
 
 class PaymentListCreateView(generics.ListCreateAPIView):
@@ -77,11 +74,10 @@ class PaymentListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
-        if self.request.method == 'POST':
-            permission_classes = [IsModerator]
+        if self.request.user.is_superuser:
+            return [IsAdminUser()]
         else:
-            permission_classes = [IsOwner | IsModerator]
-        return [permission() for permission in permission_classes]
+            return [IsOwner | IsModerator | IsAuthenticated]
 
     def get_queryset(self):
         queryset = super().get_queryset()
