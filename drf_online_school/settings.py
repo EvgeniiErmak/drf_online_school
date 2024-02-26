@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -156,3 +157,7 @@ REST_FRAMEWORK = {
 # Указываем нашу кастомную модель пользователя
 AUTH_USER_MODEL = 'users.CustomUser'
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # пример: установка времени жизни токена доступа на 1 час
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),     # пример: установка времени жизни токена обновления на 1 день
+}

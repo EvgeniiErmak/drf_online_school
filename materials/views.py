@@ -18,19 +18,18 @@ class HomeView(TemplateView):
 
 
 class CourseViewSet(viewsets.ModelViewSet):
-    queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_permissions(self):
-        if self.request.user.is_superuser:
-            return [IsAdminUser()]
-        else:
-            return [IsOwner | IsModerator | IsAuthenticated]
+    permission_classes = [IsOwner | IsModerator | IsAuthenticated]
 
     # Привязываем курс к пользователю-владельцу
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    def get_queryset(self):
+        if not self.request.user.groups.filter(name='Модераторы').exists():
+            return Course.objects.filter(owner=self.request.user)
+        else:
+            return Course.objects.all()
 
     # Добавляем метод удаления модератора курса
     def destroy_moderator(self, request, *args, **kwargs):
@@ -41,23 +40,21 @@ class CourseViewSet(viewsets.ModelViewSet):
 
 
 class LessonListCreateView(generics.ListCreateAPIView):
-    queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_permissions(self):
-        if self.request.user.is_superuser:
-            return [IsAdminUser()]
-        else:
-            return [IsOwner | IsModerator | IsAuthenticated]
+    permission_classes = [IsOwner | IsModerator | IsAuthenticated]
 
     # Привязываем урок к пользователю-владельцу при создании
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+    def get_queryset(self):
+        if not self.request.user.groups.filter(name='Модераторы').exists():
+            return Lesson.objects.filter(owner=self.request.user)
+        else:
+            return Lesson.objects.all()
+
 
 class LessonRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated]
 
