@@ -5,6 +5,7 @@ from .serializers import CourseSerializer, LessonSerializer, PaymentSerializer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import generics, permissions, viewsets
 from users.permissions import IsModerator, IsOwner
+from rest_framework.exceptions import PermissionDenied
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -58,11 +59,22 @@ class LessonUpdateView(generics.UpdateAPIView):
     serializer_class = LessonSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwner | IsModerator]
 
+    def perform_update(self, serializer):
+        instance = serializer.instance
+        if instance.owner != self.request.user and not IsModerator().has_object_permission(self.request, self, instance):
+            raise PermissionDenied("У вас нет прав на редактирование этого урока.")
+        serializer.save()
+
 
 class LessonDestroyView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwner]
+
+    def perform_destroy(self, instance):
+        if instance.owner != self.request.user:
+            raise PermissionDenied("У вас нет разрешения на удаление этого урока.")
+        instance.delete()
 
 
 class PaymentListCreateView(generics.ListCreateAPIView):
