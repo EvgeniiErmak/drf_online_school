@@ -62,7 +62,7 @@ class LessonUpdateView(generics.UpdateAPIView):
 class LessonDestroyView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
-    permission_classes = [permissions.IsAuthenticated, ~IsModerator]
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
 
 
 class PaymentListCreateView(generics.ListCreateAPIView):

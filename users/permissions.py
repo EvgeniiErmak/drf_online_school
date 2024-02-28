@@ -21,7 +21,9 @@ class IsOwner(permissions.BasePermission):
     Custom permission to only allow owners to perform certain actions.
     """
 
+    def has_permission(self, request, view):
+        return True  # Разрешение будет проверяться в has_object_permission
+
     def has_object_permission(self, request, view, obj):
         # Проверка, что пользователь является владельцем объекта
         return obj.owner == request.user or request.user.groups.filter(name='Пользователи').exists()
-
