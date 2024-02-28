@@ -3,66 +3,66 @@ from .models import Course, Lesson, Payment
 from django.views.generic.base import TemplateView
 from .serializers import CourseSerializer, LessonSerializer, PaymentSerializer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework import generics, permissions, viewsets
 from users.permissions import IsModerator, IsOwner
-from rest_framework import generics, viewsets, status
-from rest_framework.response import Response
-
-
-class HomeView(TemplateView):
-    template_name = 'materials/home.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Добавьте здесь любые необходимые данные для передачи в шаблон
-        return context
 
 
 class CourseViewSet(viewsets.ModelViewSet):
+    queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [IsOwner | IsModerator | IsAuthenticated]
-
-    # Привязываем курс к пользователю-владельцу
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
-
-    def get_queryset(self):
-        if not self.request.user.groups.filter(name='Модераторы').exists():
-            return Course.objects.filter(owner=self.request.user)
-        else:
-            return Course.objects.all()
-
-    # Добавляем метод удаления модератора курса
-    def destroy_moderator(self, request, *args, **kwargs):
-        course = self.get_object()
-        course.moderator = None
-        course.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class LessonListCreateView(generics.ListCreateAPIView):
-    serializer_class = LessonSerializer
-    permission_classes = [IsOwner | IsModerator | IsAuthenticated]
-
-    # Привязываем урок к пользователю-владельцу при создании
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
-
-    def get_queryset(self):
-        if not self.request.user.groups.filter(name='Модераторы').exists():
-            return Lesson.objects.filter(owner=self.request.user)
-        else:
-            return Lesson.objects.all()
-
-
-class LessonRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = LessonSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_permissions(self):
-        if self.request.user.is_superuser:
-            return [IsAdminUser()]
-        else:
-            return [IsOwner | IsModerator | IsAuthenticated]
+        """ Права доступа для ViewSet Course"""
+        if self.action == 'create':
+            self.permission_classes = [IsAuthenticated, ~IsModerator]
+        elif self.action == 'list':
+            self.permission_classes = [IsAuthenticated]
+        elif self.action in ['retrieve', 'update', 'partial_update']:
+            self.permission_classes = [IsAuthenticated, IsModerator | IsOwner]
+        elif self.action == 'destroy':
+            self.permission_classes = [IsAuthenticated, IsOwner]
+        return super().get_permissions()
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+        new_course = serializer.save()
+        new_course.save()
+
+
+class LessonListView(generics.ListAPIView):
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class LessonCreateView(generics.CreateAPIView):
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+    permission_classes = [permissions.IsAuthenticated, ~IsModerator]  # Изменено на ~IsModerator
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+        new_lesson = serializer.save()
+        new_lesson.save()
+
+
+class LessonRetrieveView(generics.RetrieveAPIView):
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwner, IsModerator]
+
+
+class LessonUpdateView(generics.UpdateAPIView):
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwner, IsModerator]
+
+
+class LessonDestroyView(generics.DestroyAPIView):
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
 
 
 class PaymentListCreateView(generics.ListCreateAPIView):
@@ -74,7 +74,7 @@ class PaymentListCreateView(generics.ListCreateAPIView):
         if self.request.user.is_superuser:
             return [IsAdminUser()]
         else:
-            return [IsOwner | IsModerator | IsAuthenticated]
+            return [permissions.IsAuthenticated, IsModerator | IsOwner]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -97,3 +97,12 @@ class PaymentListCreateView(generics.ListCreateAPIView):
         queryset = queryset.order_by('-payment_date')
 
         return queryset
+
+
+class HomeView(TemplateView):
+    template_name = 'materials/home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Добавьте здесь любые необходимые данные для передачи в шаблон
+        return context

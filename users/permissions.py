@@ -8,8 +8,8 @@ class IsModerator(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        # Проверка, что пользователь является модератором
-        return request.user.groups.filter(name='Модераторы').exists()
+        # Проверка, что пользователь является модератором и метод запроса не безопасный
+        return request.user.groups.filter(name='Модераторы').exists() and not request.method in permissions.SAFE_METHODS
 
 
 class IsOwner(permissions.BasePermission):
@@ -19,4 +19,5 @@ class IsOwner(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         # Проверка, что пользователь является владельцем объекта
-        return obj.user == request.user or request.user.groups.filter(name='Пользователи').exists()
+        return obj.owner == request.user or request.user.groups.filter(name='Пользователи').exists()
+
