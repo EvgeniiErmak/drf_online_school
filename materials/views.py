@@ -7,9 +7,11 @@ from rest_framework import generics, permissions, viewsets, status
 from users.permissions import IsModerator, IsOwner
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
+from .paginators import CustomPageNumberPagination
 
 
 class CourseViewSet(viewsets.ModelViewSet):
+    pagination_class = CustomPageNumberPagination
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -56,6 +58,7 @@ class LessonListView(generics.ListAPIView):
 
 
 class LessonCreateView(generics.CreateAPIView):
+    pagination_class = CustomPageNumberPagination
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [permissions.IsAuthenticated, ~IsModerator]
@@ -96,6 +99,7 @@ class LessonDestroyView(generics.DestroyAPIView):
 
 
 class PaymentListCreateView(generics.ListCreateAPIView):
+    pagination_class = CustomPageNumberPagination
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
     permission_classes = [IsAuthenticated]
