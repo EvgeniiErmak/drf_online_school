@@ -19,16 +19,29 @@ class CourseViewSet(viewsets.ModelViewSet):
             self.permission_classes = [IsAuthenticated, ~IsModerator]
         elif self.action == 'list':
             self.permission_classes = [IsAuthenticated]
-        elif self.action in ['retrieve', 'update', 'partial_update']:
+        elif self.action in ['update', 'partial_update']:
             self.permission_classes = [IsAuthenticated, IsModerator | IsOwner]
         elif self.action == 'destroy':
             self.permission_classes = [IsAuthenticated, IsOwner]
+        elif self.action == 'retrieve':
+            self.permission_classes = [IsAuthenticated]
         return super().get_permissions()
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
         new_course = serializer.save()
         new_course.save()
+
+    def perform_update(self, serializer):
+        instance = serializer.instance
+        if instance.owner != self.request.user and not IsModerator().has_object_permission(self.request, self, instance):
+            raise PermissionDenied("У вас нет прав на редактирование этого курса.")
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        if instance.owner != self.request.user:
+            raise PermissionDenied("У вас нет разрешения на удаление этого курса.")
+        instance.delete()
 
 
 class LessonListView(generics.ListAPIView):
