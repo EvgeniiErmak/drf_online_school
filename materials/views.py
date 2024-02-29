@@ -43,6 +43,10 @@ class CourseViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("У вас нет разрешения на удаление этого курса.")
         instance.delete()
 
+    def retrieve(self, request, *args, **kwargs):
+        self.permission_classes = [permissions.IsAuthenticated]  # Обновлено для получения деталей курса
+        return super().retrieve(request, *args, **kwargs)
+
 
 class LessonListView(generics.ListAPIView):
     queryset = Lesson.objects.all()
