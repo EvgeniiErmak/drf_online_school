@@ -1,7 +1,7 @@
 # materials/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CourseViewSet, LessonListView, LessonCreateView, LessonRetrieveView, LessonUpdateView, LessonDestroyView, HomeView, PaymentListCreateView
+from .views import CourseViewSet, LessonListView, LessonCreateView, LessonRetrieveView, LessonUpdateView, LessonDestroyView, PaymentListCreateView, SubscriptionViewSet, HomeView
 
 app_name = 'materials'
 
@@ -10,6 +10,9 @@ router = DefaultRouter()
 
 # Регистрируем CourseViewSet под именем 'courses'
 router.register(r'courses', CourseViewSet, basename='course')
+
+# Регистрируем SubscriptionViewSet под именем 'subscriptions'
+router.register(r'subscriptions', SubscriptionViewSet, basename='subscription')
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),

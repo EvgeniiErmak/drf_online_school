@@ -1,11 +1,12 @@
 # materials/views.py
-from .models import Course, Lesson, Payment
+from .models import Course, Lesson, Payment, Subscription
 from django.views.generic.base import TemplateView
 from .serializers import CourseSerializer, LessonSerializer, PaymentSerializer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from rest_framework import generics, permissions, viewsets
+from rest_framework import generics, permissions, viewsets, status
 from users.permissions import IsModerator, IsOwner
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -135,3 +136,32 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         # Добавьте здесь любые необходимые данные для передачи в шаблон
         return context
+
+
+class SubscriptionViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request):
+        course_id = request.data.get('course_id')
+        if not course_id:
+            return Response({'detail': 'Необходимо указать ID курса'}, status=status.HTTP_400_BAD_REQUEST)
+
+        course = Course.objects.filter(id=course_id).first()
+        if not course:
+            return Response({'detail': 'Курс с указанным ID не найден'}, status=status.HTTP_404_NOT_FOUND)
+
+        subscription, created = Subscription.objects.get_or_create(user=request.user, course=course)
+        if created:
+            message = 'Подписка на курс успешно создана'
+        else:
+            message = 'Вы уже подписаны на этот курс'
+
+        return Response({'detail': message})
+
+    def destroy(self, request, pk=None):
+        subscription = Subscription.objects.filter(user=request.user, course_id=pk).first()
+        if not subscription:
+            return Response({'detail': 'Подписка на курс с указанным ID не найдена'}, status=status.HTTP_404_NOT_FOUND)
+
+        subscription.delete()
+        return Response({'detail': 'Подписка на курс успешно отменена'})
