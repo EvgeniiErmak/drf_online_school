@@ -57,3 +57,15 @@ class CreateCheckoutSession(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"id": session.id})
+
+
+class CheckSessionStatusView(APIView):
+    def post(self, request, *args, **kwargs):
+        session_id = request.data.get('session_id')
+
+        try:
+            session = stripe.checkout.Session.retrieve(session_id)
+        except stripe.error.StripeError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(session)

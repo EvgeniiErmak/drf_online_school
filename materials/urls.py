@@ -1,7 +1,7 @@
 # materials/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .payment import CreateProductView, CreatePriceView, CreateCheckoutSession
+from .payment import CreateProductView, CreatePriceView, CreateCheckoutSession, CheckSessionStatusView
 from .views import (
     CourseViewSet,
     LessonListView,
@@ -34,4 +34,5 @@ urlpatterns = [
     path('create-product/', CreateProductView.as_view(), name='create-product'),
     path('create-price/', CreatePriceView.as_view(), name='create-price'),
     path('create-checkout-session/', CreateCheckoutSession.as_view(), name='create-checkout-session'),
+    path('check-session-status/', CheckSessionStatusView.as_view(), name='check-session-status'),
 ]
