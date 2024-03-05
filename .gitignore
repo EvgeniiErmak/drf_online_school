@@ -120,7 +120,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+drf_online_school/.env
 .venv
 env/
 venv/
