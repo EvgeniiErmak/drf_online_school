@@ -1,17 +1,23 @@
 # materials/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CourseViewSet, LessonListView, LessonCreateView, LessonRetrieveView, LessonUpdateView, LessonDestroyView, PaymentListCreateView, SubscriptionViewSet, HomeView
+from .payment import CreateProductView, CreatePriceView, CreateCheckoutSession
+from .views import (
+    CourseViewSet,
+    LessonListView,
+    LessonCreateView,
+    LessonRetrieveView,
+    LessonUpdateView,
+    LessonDestroyView,
+    PaymentListCreateView,
+    SubscriptionViewSet,
+    HomeView,
+)
 
 app_name = 'materials'
 
-# Создаем экземпляр DefaultRouter
 router = DefaultRouter()
-
-# Регистрируем CourseViewSet под именем 'courses'
 router.register(r'courses', CourseViewSet, basename='course')
-
-# Регистрируем SubscriptionViewSet под именем 'subscriptions'
 router.register(r'subscriptions', SubscriptionViewSet, basename='subscription')
 
 urlpatterns = [
@@ -23,6 +29,9 @@ urlpatterns = [
     path('lessons/<int:pk>/destroy/', LessonDestroyView.as_view(), name='lesson-destroy'),
     path('payments/', PaymentListCreateView.as_view(), name='payment-list-create'),
 
-    # Включаем роутер в urlpatterns
     path('', include(router.urls)),
+
+    path('create-product/', CreateProductView.as_view(), name='create-product'),
+    path('create-price/', CreatePriceView.as_view(), name='create-price'),
+    path('create-checkout-session/', CreateCheckoutSession.as_view(), name='create-checkout-session'),
 ]

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 import os
+import stripe
 from pathlib import Path
 from datetime import timedelta
 
@@ -162,3 +163,10 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
 }
+
+# Добавляем ключи Stripe API
+STRIPE_SECRET_KEY = 'sk_test_51Oqi4lJMCEZSlgHnEbb5q5BlykQRgHbWOtitSKwvDGGbnvBK3g8LmoFbfaeV8WWHvmoB6oEc9RnUIg9HDERcn3dX00muG2Gb0n'
+STRIPE_PUBLIC_KEY = 'pk_test_51Oqi4lJMCEZSlgHnwx21fkeSiSc1XtRmShhabe1vXJU0hyptWovmqB0MtHghSHVlAAoPoYf8vUSmCcqOPiMoSrwr00JgupbjyJ'
+
+# Инициализируем библиотеку stripe с использованием секретного ключа
+stripe.api_key = STRIPE_SECRET_KEY
