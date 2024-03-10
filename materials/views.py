@@ -6,8 +6,10 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import generics, permissions, viewsets, status
 from users.permissions import IsModerator, IsOwner
 from rest_framework.exceptions import PermissionDenied
+from .tasks import send_course_update_notification
 from rest_framework.response import Response
 from .paginators import CustomPageNumberPagination
+from django.utils import timezone
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -37,8 +39,14 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         instance = serializer.instance
-        if instance.owner != self.request.user and not IsModerator().has_object_permission(self.request, self, instance):
+        if instance.owner != self.request.user and not IsModerator().has_object_permission(self.request, self,
+                                                                                           instance):
             raise PermissionDenied("У вас нет прав на редактирование этого курса.")
+
+        # Добавьте проверку на обновление курса более четырех часов назад
+        if (timezone.now() - instance.updated_at).total_seconds() > 4 * 3600:
+            send_course_update_notification.delay(instance.id)  # Запуск задачи асинхронной отправки уведомления
+
         serializer.save()
 
     def perform_destroy(self, instance):

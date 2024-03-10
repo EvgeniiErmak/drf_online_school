@@ -46,8 +46,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'materials.apps.MaterialsConfig',
     'rest_framework_simplejwt',
+    'django_celery_beat',
     'django_bootstrap5',
     'rest_framework',
+    'crispy_forms',
     'bootstrap4',
     'drf_yasg',
     'users',
@@ -196,3 +198,13 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
+# Настройки для отправки электронных писем (пример с использованием SendGrid)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your-sendgrid-username'
+EMAIL_HOST_PASSWORD = 'your-sendgrid-password'
+
+# Использование Django Crispy Forms
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
