@@ -1,3 +1,5 @@
+# drf_online_school/settings.py
+
 """
 Django settings for drf_online_school project.
 
@@ -15,6 +17,7 @@ import stripe
 import environ
 from pathlib import Path
 from datetime import timedelta
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -176,3 +179,20 @@ STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
 
 # Инициализируем библиотеку stripe с использованием секретного ключа
 stripe.api_key = STRIPE_SECRET_KEY
+
+
+# Настройки для Celery
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# Настройки периодических задач (пример с запуском каждую минуту)
+CELERY_BEAT_SCHEDULE = {
+    'task-name': {
+        'task': 'path.to.task.function',
+        'schedule': crontab(minute='*'),
+    },
+}
+
