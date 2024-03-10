@@ -16,6 +16,7 @@ import os
 import stripe
 import environ
 from pathlib import Path
+from decouple import config
 from datetime import timedelta
 from celery.schedules import crontab
 
@@ -192,19 +193,20 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 # Настройки периодических задач (пример с запуском каждую минуту)
 CELERY_BEAT_SCHEDULE = {
-    'task-name': {
-        'task': 'path.to.task.function',
-        'schedule': crontab(minute='*'),
+    'lock_inactive_users': {
+        'task': 'users.tasks.lock_inactive_users',
+        'schedule': crontab(minute=0, hour=0),  # Запуск в полночь каждый день
     },
 }
 
-# Настройки для отправки электронных писем (пример с использованием SendGrid)
+# Настройки для отправки электронных писем (пример с использованием Gmail)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your-sendgrid-username'
-EMAIL_HOST_PASSWORD = 'your-sendgrid-password'
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
 
 # Использование Django Crispy Forms
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
