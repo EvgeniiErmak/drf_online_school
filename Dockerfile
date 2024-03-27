@@ -1,20 +1,19 @@
 # Dockerfile
 
-# Используем официальный образ Python
+# Use the official Python image
 FROM python:3.11-slim
 
-# Устанавливаем переменную среды для рабочей директории
+# Set the environment variable for the working directory
 ENV APP_HOME=/app
 WORKDIR $APP_HOME
 
-# Устанавливаем зависимости
+# Set dependencies
 ENV PYTHONPATH "${APP_HOME}:${APP_HOME}/drf_online_school"
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV PATH="${APP_HOME}/.venv/bin:$PATH"
-RUN apt-get update && apt-get install -y postgresql-client
 
-# Установка пакетов, необходимых для работы Django
+# Install necessary packages for Django and Celery
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         gcc \
@@ -23,24 +22,27 @@ RUN apt-get update \
         postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Установка зависимостей Django
+# Install Django dependencies
 RUN pip install django
 
-# Устанавливаем poetry
+# Install Poetry
 RUN pip install --no-cache-dir poetry
 
-# Устанавливаем celery
+# Install Celery
 RUN pip install --no-cache-dir celery
 
-# Копируем файлы проекта
+# Install Stripe
+RUN pip install --no-cache-dir stripe
+
+# Copy project files
 COPY . .
 
-# Создаем виртуальное окружение и устанавливаем зависимости
+# Create a virtual environment and install dependencies
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi --no-root
 
-# Открываем порт для приложения
+# Expose the port for the application
 EXPOSE 8000
 
-# Команда для запуска приложения
+# Command to run the application
 CMD ["gunicorn", "--bind", ":8000", "--workers", "3", "drf_online_school.wsgi"]
