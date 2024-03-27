@@ -1,4 +1,3 @@
-```markdown
 # Онлайн школа с использованием Django и Django REST Framework
 
 Этот проект представляет собой онлайн школу, созданную с использованием Django и Django REST Framework. Он позволяет пользователям просматривать курсы, уроки, а также редактировать свой профиль.
@@ -64,4 +63,3 @@ poetry run python manage.py test
 ## Автор
 
 Проект разработал [Евгений Ермак](https://github.com/EvgeniiErmak).
-```
