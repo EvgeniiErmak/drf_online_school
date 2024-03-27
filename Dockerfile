@@ -8,25 +8,36 @@ ENV APP_HOME=/app
 WORKDIR $APP_HOME
 
 # Устанавливаем зависимости
+ENV PYTHONPATH "${APP_HOME}:${APP_HOME}/drf_online_school"
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV PATH="${APP_HOME}/.venv/bin:$PATH"
 RUN apt-get update && apt-get install -y postgresql-client
+
+# Установка пакетов, необходимых для работы Django
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        gcc \
+        python3-dev \
+        musl-dev \
+        postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Установка зависимостей Django
+RUN pip install django
 
 # Устанавливаем poetry
 RUN pip install --no-cache-dir poetry
 
+# Устанавливаем celery
+RUN pip install --no-cache-dir celery
+
 # Копируем файлы проекта
 COPY . .
 
-# Устанавливаем зависимости проекта
+# Создаем виртуальное окружение и устанавливаем зависимости
 RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi
-
-# Собираем статические файлы
-RUN python manage.py collectstatic --noinput
-
-# Запускаем команду для миграций
-RUN python manage.py migrate
+    && poetry install --no-interaction --no-ansi --no-root
 
 # Открываем порт для приложения
 EXPOSE 8000
